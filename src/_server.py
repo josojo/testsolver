@@ -56,9 +56,11 @@ def health() -> bool:
 
 
 @app.post("/solve")
-async def solve(problem: BatchAuctionModel, request: Request):  # type: ignore
+async def solve(request: Request): 
     """API POST solve endpoint handler"""
-    logging.debug(f"Received solve request {await request.json()}")
+    body = await request.json()
+    logging.debug(f"Received solve request {body}")
+    problem = BatchAuctionModel(**body)
     solver_args = SolverArgs.from_request(request=request, meta=problem.metadata)
 
     batch = BatchAuction.from_dict(problem.dict(), solver_args.instance_name)
