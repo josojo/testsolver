@@ -1,5 +1,7 @@
 
+from decimal import Decimal
 import json
+import web3
 from src.models.order import Order, OrdersSerializedType
 from src.models.token import (
     Token,
@@ -21,8 +23,8 @@ class InteractionData:
         """Return Order object as dictionary."""
         return  {
                 'target': str(self.target),
-                'value': 0,
-                'call_data': self.call_data,
+                'value': '0',
+                'call_data': [ bytes for bytes in web3.Web3.toBytes(hexstr = self.call_data)]
                 }
         
         
@@ -53,11 +55,11 @@ class Settlement:
         # Currently, only limit buy or sell orders be handled.
         return {
             "name": str(self.name),
-            "metadata": str(self.metadata),
+            "metadata": None,
             "orders": {order.order_id: order.as_dict() for order in self.orders},
             "interaction_data": [ interaction.as_dict() for interaction in self.interaction_data],
-            "prices": self.prices,
-            "amms": [],
+            "prices":{str(key): str(price) for key,price in self.prices.items()},
+            "amms": {},
             "ref_token": str(self.ref_token)
         }
 
@@ -76,9 +78,9 @@ class Settlement:
         if (str(order.sell_token) in self.prices )& (str(order.buy_token) in self.prices):
             return False
         elif ( str(order.sell_token) not in self.prices) & (str(order.buy_token) in self.prices):
-            self.prices[order.sell_token]=self.prices[str(order.buy_token)] *swap_result['fromTokenAmount'] /swap_result['toTokenAmount']
+            self.prices[str(order.sell_token)]=int(self.prices[str(order.buy_token)] *Decimal(swap_result['fromTokenAmount']) /Decimal(swap_result['toTokenAmount']))
         elif (str(order.sell_token) in self.prices) & (str(order.buy_token) not in self.prices):
-            self.prices[str(order.buy_token)]= self.prices[str(order.sell_token)]*swap_result['toTokenAmount'] / swap_result['fromTokenAmount']
+            self.prices[str(order.buy_token)]= int(self.prices[str(order.sell_token)]*Decimal(swap_result['toTokenAmount']) / Decimal(swap_result['fromTokenAmount']))
         else:
             self.prices[str(order.buy_token)]= swap_result['toTokenAmount']
             self.prices[str(order.sell_token)]= swap_result['fromTokenAmount']

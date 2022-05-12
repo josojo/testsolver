@@ -8,3 +8,4 @@ pytest==7.1.1
 makefun==1.13.1
 mypy==0.942
 requests
+web3
