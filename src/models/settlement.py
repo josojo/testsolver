@@ -83,7 +83,7 @@ class Settlement:
             self.prices[str(order.buy_token)]= int(self.prices[str(order.sell_token)]*Decimal(swap_result['toTokenAmount']) / Decimal(swap_result['fromTokenAmount']))
         else:
             self.prices[str(order.buy_token)]= swap_result['toTokenAmount']
-            self.prices[str(order.sell_token)]= swap_result['fromTokenAmount']
+            self.prices[str(order.sell_token)]= str(int(Decimal(swap_result['fromTokenAmount'])*Decimal(1.0005)))
         return True
 
     
