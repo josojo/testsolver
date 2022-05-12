@@ -21,7 +21,7 @@ class InteractionData:
         """Return Order object as dictionary."""
         return  {
                 'target': str(self.target),
-                'value': '0',
+                'value': 0,
                 'call_data': self.call_data,
                 }
         
@@ -46,7 +46,7 @@ class Settlement:
         self.interaction_data = []
         self.orders = []
         self.ref_token = ref_token
-        self.prices = { ref_token: "1000000000000000000"}
+        self.prices = { ref_token: 1000000000000000000}
     
     def as_dict(self) :
         """Return Order object as dictionary."""
@@ -78,7 +78,7 @@ class Settlement:
         elif ( str(order.sell_token) not in self.prices) & (str(order.buy_token) in self.prices):
             self.prices[order.sell_token]=self.prices[str(order.buy_token)] *swap_result['fromTokenAmount'] /swap_result['toTokenAmount']
         elif (str(order.sell_token) in self.prices) & (str(order.buy_token) not in self.prices):
-            self.prices[str(order.buy_token)]= self.prices[str(order.sell_token)] *swap_result['toTokenAmount'] / swap_result['fromTokenAmount']
+            self.prices[str(order.buy_token)]= self.prices[str(order.sell_token)]*swap_result['toTokenAmount'] / swap_result['fromTokenAmount']
         else:
             self.prices[str(order.buy_token)]= swap_result['toTokenAmount']
             self.prices[str(order.sell_token)]= swap_result['fromTokenAmount']

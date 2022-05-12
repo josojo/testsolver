@@ -55,7 +55,7 @@ def health() -> bool:
     return True
 
 
-@app.post("/solve", response_model=SettledBatchAuctionModel)
+@app.post("/solve")
 async def solve(problem: BatchAuctionModel, request: Request):  # type: ignore
     """API POST solve endpoint handler"""
     logging.debug(f"Received solve request {await request.json()}")
@@ -66,9 +66,8 @@ async def solve(problem: BatchAuctionModel, request: Request):  # type: ignore
     print("Parameters Supplied", solver_args)
 
     # 1. Solve BatchAuction: update batch_auction with
-    print("auction content", batch.orders[1])
 
-    oneinch = OneInchExchange('0x4e3fbd56cd56c3e72c1403e103b45db9da5b9d2b')
+    oneinch = OneInchExchange('0x9008D19f58AAbD9eD0D60971565AA8510560ab41')
 
     order = batch.orders[0]
     result = oneinch.get_swap(order.sell_token, order.buy_token, order.sell_amount)
@@ -77,7 +76,7 @@ async def solve(problem: BatchAuctionModel, request: Request):  # type: ignore
     if settlement.insert_prices(order, result):
         settlement.add_order(order)
         settlement.add_payload(result['tx']['to'], result['tx']['data'])
-    print(settlement.as_dict())
+    print("fould solution is: ",settlement.as_dict())
 
     return settlement.as_dict()
 
