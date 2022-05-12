@@ -96,25 +96,26 @@ class OneInchExchange:
         return self.protocols_images
 
 
-    def get_quote(self, from_address:str, to_address:str, amount:int):
-        url = '{}/{}/{}/quote'.format(
-            self.base_url, self.version, self.chain_id)
-        url = url + '?fromTokenAddress={}&toTokenAddress={}&amount={}&fromAddress=0x9008D19f58AAbD9eD0D60971565AA8510560ab41&slippage=50'.format(
-            from_address, 
-            to_address, 
-            amount,
-            )
-        result = self._get(url)
-        return result
+    # def get_quote(self, from_address:str, to_address:str, amount:int):
+    #     url = '{}/{}/{}/quote'.format(
+    #         self.base_url, self.version, self.chain_id)
+    #     url = url + '?fromTokenAddress={}&toTokenAddress={}&amount={}&fromAddress=0x9008D19f58AAbD9eD0D60971565AA8510560ab41&slippage=50&disableEstimate=true'.format(
+    #         from_address, 
+    #         to_address, 
+    #         amount,
+    #         )
+    #     result = self._get(url)
+    #     return result
 
     def get_swap(self, from_address:str, to_address:str, amount:int):
         url = '{}/{}/{}/swap'.format(
             self.base_url, self.version, self.chain_id)
-        url = url + '?fromTokenAddress={}&toTokenAddress={}&amount={}&fromAddress=0x9008D19f58AAbD9eD0D60971565AA8510560ab41&slippage=50'.format(
+        url = url + '?fromTokenAddress={}&toTokenAddress={}&amount={}&fromAddress=0x9008D19f58AAbD9eD0D60971565AA8510560ab41&slippage=50&disableEstimate=true'.format(
             from_address, 
             to_address, 
             amount,
             )
+        print(url)
         result = self._get(url)
         return result   
 

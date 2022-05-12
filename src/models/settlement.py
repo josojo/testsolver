@@ -37,14 +37,14 @@ class Settlement:
 
     def __init__(
         self,
-        ref_token: Token,
+        ref_token: str,
         name: str = "batch_auction",
         metadata: Optional[dict] = None,
     ):
         self.name = name
         self.metadata = metadata if metadata else {}
         self.interaction_data = []
-        self._orders = []
+        self.orders = []
         self.ref_token = ref_token
         self.prices = { ref_token: "1000000000000000000"}
     
@@ -57,6 +57,8 @@ class Settlement:
             "orders": {order.order_id: order.as_dict() for order in self.orders},
             "interaction_data": [ interaction.as_dict() for interaction in self.interaction_data],
             "prices": self.prices,
+            "amms": [],
+            "ref_token": str(self.ref_token)
         }
 
     def __dict__(self) -> str:
@@ -69,4 +71,17 @@ class Settlement:
 
     def add_order(self, order):
         self.orders.append(order)
+
+    def insert_prices(self, order, swap_result):
+        if (str(order.sell_token) in self.prices )& (str(order.buy_token) in self.prices):
+            return False
+        elif ( str(order.sell_token) not in self.prices) & (str(order.buy_token) in self.prices):
+            self.prices[order.sell_token]=self.prices[str(order.buy_token)] *swap_result['fromTokenAmount'] /swap_result['toTokenAmount']
+        elif (str(order.sell_token) in self.prices) & (str(order.buy_token) not in self.prices):
+            self.prices[str(order.buy_token)]= self.prices[str(order.sell_token)] *swap_result['toTokenAmount'] / swap_result['fromTokenAmount']
+        else:
+            self.prices[str(order.buy_token)]= swap_result['toTokenAmount']
+            self.prices[str(order.sell_token)]= swap_result['fromTokenAmount']
+        return True
+
     
