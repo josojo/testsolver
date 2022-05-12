@@ -71,7 +71,7 @@ async def solve(request: Request):
 
     oneinch = OneInchExchange('0x9008D19f58AAbD9eD0D60971565AA8510560ab41')
 
-    for order in batch.orders[:3]:
+    for order in batch.orders[-3:]:
         result = oneinch.get_swap(order.sell_token, order.buy_token, order.sell_amount)
         print("quote result", result)
         settlement = Settlement(batch.ref_token.value)
