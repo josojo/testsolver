@@ -71,13 +71,14 @@ async def solve(request: Request):
 
     oneinch = OneInchExchange('0x9008D19f58AAbD9eD0D60971565AA8510560ab41')
 
-    order = batch.orders[0]
-    result = oneinch.get_swap(order.sell_token, order.buy_token, order.sell_amount)
-    print("quote result", result)
-    settlement = Settlement(batch.ref_token.value)
-    if settlement.insert_prices(order, result):
-        settlement.add_order(order)
-        settlement.add_payload(result['tx']['to'], result['tx']['data'])
+    for order in batch.orders[:3]:
+        result = oneinch.get_swap(order.sell_token, order.buy_token, order.sell_amount)
+        print("quote result", result)
+        settlement = Settlement(batch.ref_token.value)
+        if  order.buy_amount <= decimal.Decimal(result['fromTokenAmount']):
+            if settlement.insert_prices(order, result):
+                settlement.add_order(order)
+                settlement.add_payload(result['tx']['to'], result['tx']['data'])
     print("fould solution is: ",settlement.as_dict())
 
     return settlement.as_dict()
