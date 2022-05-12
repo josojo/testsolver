@@ -6,13 +6,15 @@ from __future__ import annotations
 import argparse
 import decimal
 import logging
-
+import json
 import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from pydantic import BaseSettings
 
 from src.models.batch_auction import BatchAuction
+from src.models.settlement import Settlement
+from src.oneinch.oneinch import OneInchExchange
 from src.models.solver_args import SolverArgs
 from src.util.schema import (
     BatchAuctionModel,
@@ -61,11 +63,19 @@ async def solve(problem: BatchAuctionModel, request: Request):  # type: ignore
 
     batch = BatchAuction.from_dict(problem.dict(), solver_args.instance_name)
 
-    print("Received Batch Auction", batch.name)
     print("Parameters Supplied", solver_args)
 
     # 1. Solve BatchAuction: update batch_auction with
-    # batch.solve()
+    print("auction content", batch.orders[1])
+
+    oneinch = OneInchExchange('0x4e3fbd56cd56c3e72c1403e103b45db9da5b9d2b')
+    order = batch.orders[1]
+    result = oneinch.get_swap(order.sell_token, order.buy_token, order.sell_amount)
+    print("quote result", result)
+    settlement = Settlement(batch.ref_token.value)
+    print(result)
+    settlement.add_payload(result['tx']['to'], result['tx']['data'])
+    print(settlement.as_dict())
 
     sample_output = {
         "ref_token": batch.ref_token.value,
